@@ -13,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import GlobalApi from '../_utils/GlobalApi'
+import Link from 'next/link'
 
 
 function Header() {
@@ -51,17 +52,19 @@ function Header() {
                         <DropdownMenuLabel>Browse Category</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {categoryList.map((category, index) => (
-                            <DropdownMenuItem className="flex gap-4 items-center cursor-pointer">
-                                <Image src={
-                                    process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
-                                    category?.attributes?.icon?.data?.attributes?.url}
-                                    alt='icon'
-                                    width={30}
-                                    height={30}
-                                    unoptimized={true}
-                                />
-                                <h2 className='text-lg'>{category?.attributes?.name}</h2>
-                            </DropdownMenuItem>
+                            <Link href={'/products-category/' + category.attributes.name}>
+                                <DropdownMenuItem className="flex gap-4 items-center cursor-pointer">
+                                    <Image src={
+                                        process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                                        category?.attributes?.icon?.data?.attributes?.url}
+                                        alt='icon'
+                                        width={30}
+                                        height={30}
+                                        unoptimized={true}
+                                    />
+                                    <h2 className='text-lg'>{category?.attributes?.name}</h2>
+                                </DropdownMenuItem>
+                            </Link>
                         ))}
                     </DropdownMenuContent>
                 </DropdownMenu>

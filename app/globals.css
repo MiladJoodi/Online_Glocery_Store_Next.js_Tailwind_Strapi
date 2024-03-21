@@ -74,3 +74,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+.scrollShape {
+  --sb-track-color: #ffffff;
+  --sb-thumb-color: #e4e4e4;
+  --sb-size: 8px !important;
+}
+
+.scrollShape::-webkit-scrollbar {
+  width: var(--sb-size)
+}
+
+.scrollShape::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 1px;
+}
+
+.scrollShape::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 10px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .scrollShape {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}
