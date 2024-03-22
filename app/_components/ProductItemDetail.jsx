@@ -1,14 +1,17 @@
 "use client"
-import { ShoppingBasket } from 'lucide-react'
+import { LoaderCircle, ShoppingBasket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import GlobalApi from '../_utils/GlobalApi'
+import { toast } from 'sonner'
 
 
 function ProductItemDetail({ product }) {
 
-    const jwt = sessionStorage.get("jwt");
+    const jwt = sessionStorage.getItem("jwt");
+    const user = JSON.parse(sessionStorage.getItem('user'));
     const router = useRouter();
 
     const [productTotalPrice, setProductTotalPrice] = useState(
@@ -18,11 +21,36 @@ function ProductItemDetail({ product }) {
     );
 
     const [quantity, setQuantity] = useState(1);
+    const [loading, setLoading] = useState(false)
 
-    const addToCart = ()=>{
-        if(!jwt){
+    const addToCart = () => {
+        setLoading(true)
+        if (!jwt) {
             router.push('/sign-in')
+            setLoading(false)
+            return;
         }
+
+        // data for send
+        const data = {
+            data: {
+                quantity: quantity,
+                amount: (quantity * productTotalPrice).toFixed(2),
+                products: product.id,
+                users_permissions_user: user.id,
+                userId: user.id
+            }
+        }
+        console.log(data);
+        GlobalApi.addToCart(data, jwt).then(resp => {
+            console.log(resp)
+            toast('Added to Cart')
+            setLoading(false)
+
+        }, (e) => {
+            toast('Error while adding into cart')
+            setLoading(false)
+        })
     }
 
 
@@ -56,9 +84,9 @@ function ProductItemDetail({ product }) {
                         </div>
                         <h2 className='text-2xl font-bold'> = ${(quantity * productTotalPrice).toFixed(2)}</h2>
                     </div>
-                    <Button className="flex gap-3" onClick={() => addToCart()}>
+                    <Button disabled={loading} className="flex gap-3" onClick={() => addToCart()}>
                         <ShoppingBasket />
-                        Add To Cart
+                        {loading? <LoaderCircle className='animate-spin' /> : 'Add To Cart'}
                     </Button>
                 </div>
                 <h2><span className='font-bold'>Category:</span> {product.attributes.categories.data[0].attributes.name}</h2>

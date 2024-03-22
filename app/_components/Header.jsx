@@ -20,6 +20,8 @@ import { useRouter } from 'next/navigation'
 function Header() {
     const [categoryList, setCategoryList] = useState([])
     const isLogin = sessionStorage.getItem('jwt') ? true : false;
+    const user = JSON.parse(sessionStorage.getItem('user'))
+    const [totalCartItem, setTotalCartItem] = useState(0)
     const router = useRouter()
 
     useEffect(() => {
@@ -30,6 +32,11 @@ function Header() {
         GlobalApi.getCategory().then(resp => {
             setCategoryList(resp.data.data);
         })
+    }
+
+    // Total counter
+    const getCartItems = async ()=>{
+        const cartItemList = await Global.getCartItems(user)
     }
 
     const OnSignOut = ()=>{
@@ -61,7 +68,7 @@ function Header() {
                         <DropdownMenuLabel>Browse Category</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {categoryList.map((category, index) => (
-                            <Link key={index} href={'/products-category/' + category.attributes.name}>
+                            <Link key={index} href={'/product-category/' + category.attributes.name}>
                                 <DropdownMenuItem className="flex gap-4 items-center cursor-pointer">
                                     <Image src={
                                         process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
@@ -91,7 +98,9 @@ function Header() {
 
             {/* Right */}
             <div className='flex gap-5 items-center'>
-                <h2 className='flex gap-2 items-center text-lg'><ShoppingBag /> 0</h2>
+                <h2 className='flex gap-2 items-center text-lg'><ShoppingBag className='w-7 h-7' />
+                    <span className='bg-primary text-white px-2 rounded-full'>0</span>
+                </h2>
                 {!isLogin ? (
                     <Link href={'/sign-in'}>
                         <Button>Login</Button>

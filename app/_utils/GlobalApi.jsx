@@ -1,3 +1,5 @@
+import { data } from "autoprefixer";
+
 const { default: axios } = require("axios");
 
 const axiosClient = axios.create({
@@ -41,6 +43,21 @@ const SignIn = (email, password)=> axiosClient.post('/auth/local',{
     password:password
 })
 
+// Add To Cart
+const addToCart = (data, jwt)=> axiosClient.post('/user-carts', data, {
+    headers:{
+        Authorization: 'Bearer ' +jwt
+    }
+})
+
+    // Use to get total cart item counter
+    const getCartItems = (userId, jwt)=>axiosClient.get('/user-carts?filters[userId][$eq]='+userId+'&populate=*', {
+        headers: {
+            Authorization: 'Bearer '+jwt
+        }
+    }).then(resp=>{
+        return data.data;
+    })
 
 
 export default {
@@ -50,5 +67,7 @@ export default {
     getAllProducts,
     getProductsByCategory,
     registerUser,
-    SignIn
+    SignIn,
+    addToCart,
+    getCartItems,
 }
