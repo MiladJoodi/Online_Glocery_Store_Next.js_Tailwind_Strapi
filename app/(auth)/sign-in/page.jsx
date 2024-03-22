@@ -2,10 +2,11 @@
 import GlobalApi from '@/app/_utils/GlobalApi'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { LoaderIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 function SignIn() {
@@ -13,9 +14,19 @@ function SignIn() {
   const [password, setPassword] = useState();
   const [email, setEmail] = useState();
   const router = useRouter();
+  const [loader, setLoader] = useState(false);
+
+  useEffect(() => {
+    const jwt = sessionStorage.getItem('jwt');
+    if (jwt) {
+      router.push("/")
+    }
+  }, [])
+
 
   const onSignIn = () => {
-    GlobalApi.SignIn(email, password).then(resp=>{
+    setLoader(true);
+    GlobalApi.SignIn(email, password).then(resp => {
       console.log(resp.data.user);
       console.log(resp.data.jwt);
 
@@ -24,11 +35,13 @@ function SignIn() {
 
       toast("Login Successfully")
       router.push('/');
+      setLoader(false);
 
-    }, (e)=>{
+    }, (e) => {
       console.log(e);
-      toast("Server Error")
-      
+      toast(e?.response?.data?.error?.message)
+      setLoader(false);
+
     })
   }
 
@@ -46,7 +59,9 @@ function SignIn() {
           <Input type='password' placeholder='password' onChange={(e) => setPassword(e.target.value)} />
           <Button onClick={() => onSignIn()}
             disabled={!(email || password)}
-          >Sign In</Button>
+          >
+            {loader ? <LoaderIcon className='animate-spin' /> : "Sign In"}
+          </Button>
           <p>
             Don't have an account
             <Link href={'/create-account'} className='text-blue-500'>

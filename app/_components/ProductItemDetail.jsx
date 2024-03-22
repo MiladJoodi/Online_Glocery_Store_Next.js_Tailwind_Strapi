@@ -3,9 +3,13 @@ import { ShoppingBasket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 
 function ProductItemDetail({ product }) {
+
+    const jwt = sessionStorage.get("jwt");
+    const router = useRouter();
 
     const [productTotalPrice, setProductTotalPrice] = useState(
         product.attributes.sellingPrice ?
@@ -14,6 +18,13 @@ function ProductItemDetail({ product }) {
     );
 
     const [quantity, setQuantity] = useState(1);
+
+    const addToCart = ()=>{
+        if(!jwt){
+            router.push('/sign-in')
+        }
+    }
+
 
     return (
         <div className='grid grid-cols-1 md:grid-cols-2 p-7 bg-white text-black'>
@@ -39,13 +50,13 @@ function ProductItemDetail({ product }) {
                 <div className='flex flex-col items-baseline gap-3'>
                     <div className='flex gap-3 items-center'>
                         <div className='p-2 border flex gap-10 items-center px-5'>
-                            <button disabled={quantity==1} onClick={()=>setQuantity(quantity-1)}>-</button>
+                            <button disabled={quantity == 1} onClick={() => setQuantity(quantity - 1)}>-</button>
                             <h2>{quantity}</h2>
-                            <button onClick={()=>setQuantity(quantity+1)}>+</button>
+                            <button onClick={() => setQuantity(quantity + 1)}>+</button>
                         </div>
                         <h2 className='text-2xl font-bold'> = ${(quantity * productTotalPrice).toFixed(2)}</h2>
                     </div>
-                    <Button className="flex gap-3 ">
+                    <Button className="flex gap-3" onClick={() => addToCart()}>
                         <ShoppingBasket />
                         Add To Cart
                     </Button>

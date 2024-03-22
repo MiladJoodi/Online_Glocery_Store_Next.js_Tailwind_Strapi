@@ -7,17 +7,21 @@ import Link from 'next/link'
 import GlobalApi from '@/app/_utils/GlobalApi'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { LoaderIcon } from 'lucide-react'
 
 function CreateAccount() {
 
     const [username, setUsername] = useState();
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
+    const [loader, setLoader] = useState(false);
+
 
     const router = useRouter();
 
-    const onCreateAccount = ()=>{
-        GlobalApi.registerUser(username, email, password).then(resp=>{
+    const onCreateAccount = () => {
+        setLoader(true)
+        GlobalApi.registerUser(username, email, password).then(resp => {
             console.log(resp.data.user)
             console.log(resp.data.jwt)
 
@@ -27,8 +31,11 @@ function CreateAccount() {
             toast("Account Created Successfully")
 
             router.push('/');
-        },(e)=>{
-            toast("Error while creating account")
+            setLoader(false)
+        }, (e) => {
+            setLoader(false)
+            toast(e?.response?.data?.error?.message)
+
         })
     }
 
@@ -41,12 +48,14 @@ function CreateAccount() {
 
                 {/* Inputs */}
                 <div className='w-full flex flex-col gap-5 mt-7'>
-                    <Input placeholder='Username' onChange={(e)=>setUsername(e.target.value)} />
-                    <Input placeholder='name@example.com' onChange={(e)=>setEmail(e.target.value)} />
-                    <Input type='password' placeholder='password' onChange={(e)=>setPassword(e.target.value)} />
-                    <Button onClick={()=>onCreateAccount()}
-                    disabled={(!username || !email || !password)}
-                    >Create an Account</Button>
+                    <Input placeholder='Username' onChange={(e) => setUsername(e.target.value)} />
+                    <Input placeholder='name@example.com' onChange={(e) => setEmail(e.target.value)} />
+                    <Input type='password' placeholder='password' onChange={(e) => setPassword(e.target.value)} />
+                    <Button onClick={() => onCreateAccount()}
+                        disabled={(!username || !email || !password)}
+                    >
+                        {loader ? <LoaderIcon className='animate-spin' /> : "Create an Account"}
+                    </Button>
                     <p>
                         Already have an account
                         <Link href={'/sign-in'} className='text-blue-500'>
